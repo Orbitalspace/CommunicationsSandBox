@@ -1,3 +1,4 @@
 archive
 node_modules
 2018-08-03-Raspbian-SatNOGS-lite.img
+*.packet
