@@ -1,18 +1,20 @@
 // Based on https://thomask.sdf.org/blog/2018/12/15/sending-raw-ax25-python.html
-const nodePath            = process.argv[0]
-const jsPath              = process.argv[1]
-const sourceCallSign      = process.argv[2]
+const nodePath = process.argv[0]
+const jsPath = process.argv[1]
+const sourceCallSign = process.argv[2]
 const destinationCallSign = process.argv[3]
-const message             = process.argv[4]
+const message = process.argv[4]
+const listenerHost = '127.0.0.1'
+const listenerPort = 8001
 // https://www.ka9q.net/papers/kiss.html
 // https://www.tapr.org/pdf/AX25.2.2.pdf
-const KISS_FEND  = 0xC0 // Frame start/end marker.
-const KISS_FESC  = 0xDB // Escape character.
+const KISS_FEND = 0xC0 // Frame start/end marker.
+const KISS_FESC = 0xDB // Escape character.
 const KISS_TFEND = 0xDC // If after an escape, means there was an 0xC0 in the source message.
 const KISS_TFESC = 0xDD // If after an escape, means there was an 0xDB in the source message.
-const KISS_CMD   = 0x00 // Two nybbles combined - TNC 0, command 0 (send data).
-const C_BYTE     = 0x03 // This is a UI frame.
-const PID        = 0xF0 // No protocol.
+const KISS_CMD = 0x00 // Two nybbles combined - TNC 0, command 0 (send data).
+const C_BYTE = 0x03 // This is a UI frame.
+const PID = 0xF0 // No protocol.
 
 if (process.argv.length != 5 || !sourceCallSign || !destinationCallSign || !message) {
     console.log(`Usage ${jsPath} <source callsign> <destination callsign> <message>`)
@@ -29,10 +31,10 @@ if (process.argv.length != 5 || !sourceCallSign || !destinationCallSign || !mess
  * @param {boolean} final Defines if low bit should be 1.
  * @returns {Array} Encoded call sign.
  */
- function encodeAddress(callSign, final) {
-    if (callSign.indexOf("-") === -1) callSign += "-0" // default to SSID 0
-    const [call, ssid] = callSign.split("-")
-    if (call.length < 6) call = call + " ".repeat(6 - call.length) // Pad short call signs with spaces
+function encodeAddress(callSign, final) {
+    if (callSign.indexOf('-') === -1) callSign += '-0' // default to SSID 0
+    const [call, ssid] = callSign.split('-')
+    if (call.length < 6) call = call + ' '.repeat(6 - call.length) // Pad short call signs with spaces
     const encodedCall = []
     for (character of call.substr(0, 6)) encodedCall.push(character.charCodeAt(0) << 1)
     const encodedSSID = (parseInt(ssid) << 1) | 0b01100000 | (final ? 0b00000001 : 0)
@@ -102,7 +104,7 @@ function wrapKissFrameOnPacket(packet) {
  * @param {number} port port of listener.
  */
 function sendFrame(frameBuffer, host, port) {
-    const net = require("net")
+    const net = require('net')
     const socket = net.Socket()
     socket.connect(port, host)
         .end(frameBuffer)
@@ -113,7 +115,7 @@ function sendFrame(frameBuffer, host, port) {
  * Assemble then escape packet then wrap packet with KISS frame then create buffer then send frame to packet listener.
  */
 (() => {
-    sendFrame(Buffer.from(wrapKissFrameOnPacket(escapePacket(assembleRawPacket(sourceCallSign, destinationCallSign, message)))), "127.0.0.1", 8001)
+    sendFrame(Buffer.from(wrapKissFrameOnPacket(escapePacket(assembleRawPacket(sourceCallSign, destinationCallSign, message)))), listenerHost, listenerPort)
 })()
 // OR the equivelant readable version below.
 // (() => {
@@ -123,5 +125,5 @@ function sendFrame(frameBuffer, host, port) {
 //     const kissFrame = wrapKissFrameOnPacket(escapedPacket)
 //     const frameBuffer = Buffer.from(kissFrame)
 //     // Connect to Dire Wolf listening on port 8001 on this machine and send the frame
-//     sendFrame(frameBuffer, "127.0.0.1", 8001)
+//     sendFrame(frameBuffer, listenerHost, listenerPort)
 // })()
