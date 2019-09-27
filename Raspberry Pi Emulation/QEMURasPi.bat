@@ -1,0 +1,11 @@
+C:\"Program Files"\qemu\qemu-system-arm.exe ^
+    -M versatilepb ^
+    -cpu arm1176 ^
+    -m 256 ^
+    -drive file=.\2018-08-03-Raspbian-SatNOGS-lite.img,format=raw ^
+    -net nic ^
+    -net user,hostfwd=tcp::5022-:22 ^
+    -dtb .\versatile-pb.dtb ^
+    -kernel .\kernel-qemu-4.14.79-stretch ^
+    -append "root=/dev/sda2 panic=1" ^
+    -no-reboot
