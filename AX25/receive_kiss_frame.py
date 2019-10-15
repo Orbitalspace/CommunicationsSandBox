@@ -3,6 +3,8 @@ import struct
 import time
 import socket
 
+# Decoding adapted from https://gist.github.com/mumrah/8fe7597edde50855211e27192cce9f88 with modifications
+
 def decode_addr(data, cursor):
     (a1, a2, a3, a4, a5, a6, a7) = struct.unpack("<BBBBBBB", data[cursor:cursor+7])
     hrr = a7 >> 5
@@ -95,4 +97,3 @@ while True:
     data = clientSocket.recv(1024)
     p(data)
     clientSocket.close()
-
