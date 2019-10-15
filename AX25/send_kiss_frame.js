@@ -5,7 +5,7 @@ const sourceCallSign = process.argv[2]
 const destinationCallSign = process.argv[3]
 const message = process.argv[4]
 const listenerHost = '127.0.0.1'
-const listenerPort = 8001
+const listenerPort = 8002
 // https://www.ka9q.net/papers/kiss.html
 // https://www.tapr.org/pdf/AX25.2.2.pdf
 const KISS_FEND = 0xC0 // Frame start/end marker.
@@ -33,7 +33,7 @@ if (process.argv.length != 5 || !sourceCallSign || !destinationCallSign || !mess
  */
 function encodeAddress(callSign, final) {
     if (callSign.indexOf('-') === -1) callSign += '-0' // default to SSID 0
-    const [call, ssid] = callSign.split('-')
+    let [call, ssid] = callSign.split('-')
     if (call.length < 6) call = call + ' '.repeat(6 - call.length) // Pad short call signs with spaces
     const encodedCall = []
     for (character of call.substr(0, 6)) encodedCall.push(character.charCodeAt(0) << 1)

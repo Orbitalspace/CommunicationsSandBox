@@ -1,5 +1,5 @@
 const listenHost = '127.0.0.1'
-const listenPort = 8001
+const listenPort = 8002
 const fileName = '.\\received.packet'
 
 /**
