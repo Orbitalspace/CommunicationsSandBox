@@ -1,5 +1,7 @@
 import hexdump
 import struct
+import time
+import socket
 
 def decode_addr(data, cursor):
     (a1, a2, a3, a4, a5, a6, a7) = struct.unpack("<BBBBBBB", data[cursor:cursor+7])
@@ -42,12 +44,12 @@ def p(frame):
     (dest_addr, dest_hrr, dest_ext) = decode_addr(frame, pos)
     pos += 7
     print(dest_addr)
-    print ("DST: " + dest_addr)
+    print ("DST: " + dest_addr.decode())
     
     # SRC
     (src_addr, src_hrr, src_ext) = decode_addr(frame, pos)  
     pos += 7
-    print ("SRC: " + src_addr)
+    print ("SRC: " + src_addr.decode())
     
     # REPEATERS
     ext = src_ext
@@ -57,7 +59,7 @@ def p(frame):
         pos += 7
 
     # CTRL
-    (ctrl,) = struct.unpack("<B", frame[pos])
+    (ctrl,) = struct.unpack("<B", bytes([frame[pos]]))
     pos += 1
   
     print (ctrl)
@@ -71,10 +73,6 @@ def p(frame):
 
     print(hexdump.hexdump(frame))
 
-
-
-import time
-import socket
 
 # creating a socket object
 s = socket.socket(socket.AF_INET,
@@ -95,7 +93,6 @@ while True:
     clientSocket, addr = s.accept()
     print("got a connection from %s" % str(addr))
     data = clientSocket.recv(1024)
-    print(data)
     p(data)
     clientSocket.close()
 
